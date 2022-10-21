@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c0b78d1d-9378-4008-8bba-e3106f8b4745" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="choicerouter-marksFlow" doc:id="fe5865a9-ce28-4350-8f08-bd87afef5d67" >
+		<http:listener doc:name="Listener" doc:id="249de9b9-f0b2-4268-8d77-c8cfb58be6f1" config-ref="HTTP_Listener_config" path="/test"/>
+		<logger level="INFO" doc:name="Logger" doc:id="82379803-39a3-4556-a466-ba51997443ba" message="start flow"/>
+		<choice doc:name="Choice" doc:id="fdd7f118-6ef1-4798-ba5c-8b2a00fef031" >
+			<when expression='#[payload.marks &gt;= 300 and payload.marks &lt; 500]'>
+				<ee:transform doc:name="Transform Message" doc:id="6110716e-d0da-4485-bfde-fe10704567ee" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"1st.div."]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[payload.marks &gt;= "225" and payload.marks &lt; "300"]'>
+				<ee:transform doc:name="Transform Message" doc:id="fa2195df-b949-4fed-b654-0ecfc85863d4" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"2nd. divission"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[payload.marks &gt;= 150 and payload.marks &lt; 225]'>
+				<ee:transform doc:name="Transform Message" doc:id="47bc6f62-1c8d-4787-9dd1-5bb575805ffe" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"3rd. div."]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="d30d529c-2b53-4344-b61a-f5ce5cd65731" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"fail"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="db9725f5-a36a-4d77-8522-f6219480f2de" message="end flow"/>
+	</flow>
+</mule>
